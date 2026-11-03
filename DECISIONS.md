@@ -13,3 +13,5 @@ Each design decision is an ADR (Architecture Decision Record) in [`docs/adr/`](d
 | [0007](docs/adr/0007-fip-invariant-as-constraint.md) | A CHECK constraint guards the "live" invariant; the `loop_live_question` view drives promotion. |
 | [0008](docs/adr/0008-question-templates.md) | Template placeholders, period labels, ISO durations and the `(template_id, template_period)` uniqueness key. |
 | [0009](docs/adr/0009-packs-built-in-app.md) | Users build packs in the app (database rows, guided builder in UI and MCP); folders are the import/export format; derived series are declarative. |
+| [0010](docs/adr/0010-refresh-vintages-and-shape.md) | Refresh appends a vintage only when it is newer and different; a missing declared column is a shape change; one transaction per signal. |
+| [0011](docs/adr/0011-sql-files-loaded-by-newest-migration.md) | A manifest lists the SQL files; only the newest migration reloads them, so a fresh database loads them against the final schema. |

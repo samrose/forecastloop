@@ -1,0 +1,7 @@
+# Load order for SQL files (paths relative to priv/). ForecastLoop.SQLFiles.reload!/1
+# drops the fl, derive and rules schemas and runs these files in this order.
+sql/functions/period.sql
+sql/functions/attrs_match.sql
+sql/derive/aggregate_by_period.sql
+sql/derive/change_over_periods.sql
+sql/derive/ratio.sql
