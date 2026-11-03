@@ -41,3 +41,6 @@ config :phoenix_live_view,
 # Sort query params output of verified routes for robust url comparisons
 config :phoenix,
   sort_verified_routes_query_params: true
+
+# HTTP CSV sources call a Req.Test stub in tests instead of the network.
+config :forecast_loop, :http_csv_req_options, plug: {Req.Test, ForecastLoop.Sources.HTTPCSV}

@@ -32,6 +32,55 @@ defmodule ForecastLoop.Batch do
     end
   end
 
+  @doc """
+  Opens a work item unless an open one already exists for the same
+  (kind, subject_type, subject_id). Returns the number inserted (0 or 1).
+  """
+  @spec open_work_item(String.t(), String.t(), term(), map(), integer() | nil, String.t()) ::
+          0 | 1
+  def open_work_item(kind, subject_type, subject_id, payload, run_id, asserted_by \\ "batch") do
+    now = DateTime.utc_now()
+
+    {n, _} =
+      Repo.insert_all(
+        WorkItem,
+        [
+          %{
+            kind: kind,
+            subject_type: subject_type,
+            subject_id: to_string(subject_id),
+            payload: payload,
+            status: "open",
+            run_id: run_id,
+            asserted_by: asserted_by,
+            inserted_at: now,
+            updated_at: now
+          }
+        ],
+        on_conflict: :nothing,
+        conflict_target:
+          {:unsafe_fragment, "(kind, subject_type, subject_id) WHERE status = 'open'"}
+      )
+
+    n
+  end
+
+  @doc "Marks open work items of `kinds` for one subject as done. Returns the count closed."
+  @spec close_work_items([String.t()], String.t(), term()) :: non_neg_integer()
+  def close_work_items(kinds, subject_type, subject_id) do
+    {n, _} =
+      Repo.update_all(
+        from(w in WorkItem,
+          where:
+            w.status == "open" and w.kind in ^kinds and w.subject_type == ^subject_type and
+              w.subject_id == ^to_string(subject_id)
+        ),
+        set: [status: "done", updated_at: DateTime.utc_now()]
+      )
+
+    n
+  end
+
   @doc "Lists work items, open first."
   def list_work_items(opts \\ []) do
     status = Keyword.get(opts, :status, "open")
