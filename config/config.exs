@@ -1,0 +1,80 @@
+# This file is responsible for configuring your application
+# and its dependencies with the aid of the Config module.
+#
+# This configuration file is loaded before any dependency and
+# is restricted to this project.
+
+# General application configuration
+import Config
+
+config :forecast_loop,
+  ecto_repos: [ForecastLoop.Repo],
+  generators: [timestamp_type: :utc_datetime_usec, binary_id: false]
+
+config :forecast_loop, ForecastLoop.Repo,
+  migration_timestamps: [type: :utc_datetime_usec],
+  migration_primary_key: [type: :bigserial]
+
+# Oban (a PostgreSQL-backed job queue) runs the nightly batch.
+# Phase 4 adds the 02:00 UTC cron entry for ForecastLoop.Batch.NightlyWorker.
+config :forecast_loop, Oban,
+  engine: Oban.Engines.Basic,
+  repo: ForecastLoop.Repo,
+  queues: [batch: 1],
+  plugins: [{Oban.Plugins.Pruner, max_age: 60 * 60 * 24 * 30}]
+
+# Numerical work runs on EXLA (Nx compiled with the XLA compiler).
+config :nx, default_backend: EXLA.Backend
+
+# Configure the endpoint
+config :forecast_loop, ForecastLoopWeb.Endpoint,
+  url: [host: "localhost"],
+  adapter: Bandit.PhoenixAdapter,
+  render_errors: [
+    formats: [html: ForecastLoopWeb.ErrorHTML, json: ForecastLoopWeb.ErrorJSON],
+    layout: false
+  ],
+  pubsub_server: ForecastLoop.PubSub,
+  live_view: [signing_salt: "p7iGHmWw"]
+
+# Configure the mailer
+#
+# By default it uses the "Local" adapter which stores the emails
+# locally. You can see the emails in your browser, at "/dev/mailbox".
+#
+# For production it's recommended to configure a different adapter
+# at the `config/runtime.exs`.
+config :forecast_loop, ForecastLoop.Mailer, adapter: Swoosh.Adapters.Local
+
+# Configure esbuild (the version is required)
+config :esbuild,
+  version: "0.25.4",
+  forecast_loop: [
+    args:
+      ~w(js/app.js --bundle --target=es2022 --outdir=../priv/static/assets/js --external:/fonts/* --external:/images/* --alias:@=.),
+    cd: Path.expand("../assets", __DIR__),
+    env: %{"NODE_PATH" => [Path.expand("../deps", __DIR__), Mix.Project.build_path()]}
+  ]
+
+# Configure tailwind (the version is required)
+config :tailwind,
+  version: "4.1.12",
+  forecast_loop: [
+    args: ~w(
+      --input=assets/css/app.css
+      --output=priv/static/assets/css/app.css
+    ),
+    cd: Path.expand("..", __DIR__)
+  ]
+
+# Configure Elixir's Logger
+config :logger, :default_formatter,
+  format: "$time $metadata[$level] $message\n",
+  metadata: [:request_id]
+
+# Use Jason for JSON parsing in Phoenix
+config :phoenix, :json_library, Jason
+
+# Import environment specific config. This must remain at the bottom
+# of this file so it overrides the configuration defined above.
+import_config "#{config_env()}.exs"
