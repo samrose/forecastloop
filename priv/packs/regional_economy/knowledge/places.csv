@@ -1,0 +1,8 @@
+predicate,subject,object,attributes,valid_from,valid_to,domain,note
+entity_alias,"Ingham County, MI",Ingham County,,,,regional_economy,A common written form of the county name.
+entity_attr,Ingham County,state=Michigan,,,,regional_economy,Ingham County is in Michigan.
+entity_attr,Ingham County,fips=26065,,,,regional_economy,County FIPS code.
+entity_attr,Michigan,fips=26,,,,regional_economy,State FIPS code.
+entity_domain,Ingham County,regional_economy,,,,regional_economy,Forecasts about the county belong to this domain.
+entity_domain,Michigan,regional_economy,,,,regional_economy,State context series belong to this domain.
+min_history,regional_economy,24,,,,regional_economy,Two years of monthly points before base-rate models run.

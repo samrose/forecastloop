@@ -1,0 +1,4 @@
+[
+  {"agent": "model:poisson", "model_module": "ForecastLoop.Models.Poisson", "version": "release_engineering-1", "domains": ["release_engineering"], "params": {"trailing_days": 180}, "notes": "Rate of matching incidents over the last 180 days."},
+  {"agent": "model:base_rate", "model_module": "ForecastLoop.Models.BaseRate", "version": "release_engineering-1", "domains": ["release_engineering"], "params": {"trailing_n": 12}, "notes": "Share of past windows (or template questions) where the condition held."}
+]

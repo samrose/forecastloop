@@ -11,12 +11,23 @@ now = DateTime.utc_now()
 
 # Default rule parameters. The rule views read these from the `config` table.
 config = [
-  {"stale_forecast_threshold", %{"fraction_of_trailing_range" => 0.10, "trailing_days" => 30},
-   "loop_stale_forecast: a cited signal must move by this fraction of its trailing range."},
+  {"stale_forecast_threshold",
+   %{"fraction_of_trailing_range" => 0.10, "trailing_days" => 30, "min_points" => 12},
+   "loop_stale_forecast: a cited signal must move by this fraction of its trailing range (the last trailing_days, or the last min_points values if more)."},
+  {"changepoint_detector",
+   %{
+     "min_size" => 8,
+     "sig_level" => 0.01,
+     "permutations" => 199,
+     "alpha" => 1.0,
+     "seed" => 42,
+     "max_points" => 240
+   }, "Changepoints step: EDivisive options and the history limit."},
   {"regime_shift_recent_window", %{"days" => 30},
    "loop_regime_shift_recent: how far back a regime shift counts as recent."},
-  {"drift_windows", %{"recent_days" => 90, "baseline_days" => 365, "margin" => 0.05},
-   "cal_drift: recent mean Brier must exceed baseline mean Brier by this margin."},
+  {"drift_windows",
+   %{"recent_days" => 90, "baseline_days" => 365, "margin" => 0.05, "min_n" => 3},
+   "cal_drift: recent mean Brier must exceed baseline mean Brier by this margin, with at least min_n scores in each window."},
   {"definition_change_window", %{"days" => 30},
    "gap_definition_change: attribute keys and types are compared with this many prior days."},
   {"stale_source_multiple", %{"cadence_multiple" => 2},

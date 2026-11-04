@@ -1,6 +1,7 @@
 defmodule ForecastLoop.Fixtures do
   @moduledoc "Test data builders. Each inserts one row and returns it."
   alias ForecastLoop.{Ledger, Observations, Repo}
+  alias ForecastLoop.Ledger.Question
   alias ForecastLoop.Signals.Signal
 
   def ts(iso) do
@@ -66,5 +67,76 @@ defmodule ForecastLoop.Fixtures do
   def question(author, overrides \\ %{}) do
     {:ok, q} = Ledger.create_question(fip_attrs(author, overrides))
     q
+  end
+
+  @doc "A live question: created by `author`, reviewed by another agent, promoted."
+  def live_question(author, overrides \\ %{}) do
+    q = question(author, overrides)
+    {:ok, q} = Ledger.review_question(q, agent(), "test")
+
+    q
+    |> Question.changeset(%{status: "live", asserted_by: "test"})
+    |> Repo.update!()
+  end
+
+  def forecast(q, agent, p, made_at, extra \\ %{}) do
+    {:ok, f} =
+      Ledger.submit_forecast(
+        Map.merge(
+          %{
+            question_id: q.id,
+            agent_id: agent.id,
+            probability: p,
+            made_at: ts(made_at),
+            asserted_by: "test"
+          },
+          extra
+        )
+      )
+
+    f
+  end
+
+  def resolve(q, outcome, at) do
+    {:ok, r} =
+      Ledger.resolve_question(q, %{
+        outcome: outcome,
+        resolved_at: ts(at),
+        source: "test",
+        resolved_by: "test",
+        asserted_by: "test"
+      })
+
+    r
+  end
+
+  @doc "A series condition on `signal` with an explicit window."
+  def series_rc(signal, op, value, from, to, at \\ "end_of_window") do
+    %{
+      "type" => "series",
+      "signal_id" => signal.id,
+      "op" => op,
+      "value" => value,
+      "at" => at,
+      "window" => %{"from" => from, "to" => to}
+    }
+  end
+
+  def events_rc(signal, op, value, from, to, where \\ %{}) do
+    %{
+      "type" => "events",
+      "signal_id" => signal.id,
+      "op" => op,
+      "value" => value,
+      "where" => where,
+      "window" => %{"from" => from, "to" => to}
+    }
+  end
+
+  def set_config(key, value) do
+    Repo.query!(
+      "INSERT INTO config (key, value, asserted_by, inserted_at, updated_at) VALUES ($1, $2, 'test', now(), now()) ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value",
+      [key, value]
+    )
   end
 end

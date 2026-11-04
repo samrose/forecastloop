@@ -1,0 +1,171 @@
+{
+  "incidents": [
+    {
+      "id": "01HQ0004",
+      "name": "Incident 01HQ0004",
+      "mode": "standard",
+      "created_at": "2026-03-01T20:00:00Z",
+      "updated_at": "2026-03-02T01:00:00Z",
+      "severity": {
+        "id": "sev_SEV2",
+        "name": "SEV2",
+        "rank": 1
+      },
+      "incident_status": {
+        "id": "st",
+        "name": "Closed",
+        "category": "closed"
+      },
+      "custom_field_entries": [
+        {
+          "custom_field": {
+            "id": "cf_svc",
+            "name": "Affected services"
+          },
+          "values": [
+            {
+              "value_catalog_entry": {
+                "id": "ce_payments-api",
+                "name": "payments-api"
+              }
+            }
+          ]
+        }
+      ],
+      "incident_timestamp_values": []
+    },
+    {
+      "id": "01HQ0005",
+      "name": "Incident 01HQ0005",
+      "mode": "standard",
+      "created_at": "2026-03-20T11:00:00Z",
+      "updated_at": "2026-03-20T15:00:00Z",
+      "severity": {
+        "id": "sev_P0",
+        "name": "P0",
+        "rank": 1
+      },
+      "incident_status": {
+        "id": "st",
+        "name": "Closed",
+        "category": "closed"
+      },
+      "custom_field_entries": [
+        {
+          "custom_field": {
+            "id": "cf_svc",
+            "name": "Affected services"
+          },
+          "values": [
+            {
+              "value_catalog_entry": {
+                "id": "ce_web-frontend",
+                "name": "web-frontend"
+              }
+            }
+          ]
+        },
+        {
+          "custom_field": {
+            "id": "cf_cause",
+            "name": "Cause"
+          },
+          "values": [
+            {
+              "value_option": {
+                "id": "opt_config change",
+                "value": "config change"
+              }
+            }
+          ]
+        }
+      ],
+      "incident_timestamp_values": []
+    },
+    {
+      "id": "01HQ0006",
+      "name": "Incident 01HQ0006",
+      "mode": "standard",
+      "created_at": "2026-04-03T08:00:00Z",
+      "updated_at": "2026-04-03T10:00:00Z",
+      "severity": {
+        "id": "sev_SEV1",
+        "name": "SEV1",
+        "rank": 1
+      },
+      "incident_status": {
+        "id": "st",
+        "name": "Closed",
+        "category": "closed"
+      },
+      "custom_field_entries": [
+        {
+          "custom_field": {
+            "id": "cf_svc",
+            "name": "Affected services"
+          },
+          "values": [
+            {
+              "value_catalog_entry": {
+                "id": "ce_auth-api",
+                "name": "auth-api"
+              }
+            }
+          ]
+        },
+        {
+          "custom_field": {
+            "id": "cf_cause",
+            "name": "Cause"
+          },
+          "values": [
+            {
+              "value_option": {
+                "id": "opt_third-party",
+                "value": "third-party"
+              }
+            }
+          ]
+        }
+      ],
+      "incident_timestamp_values": []
+    },
+    {
+      "id": "01HQ0099",
+      "name": "Incident 01HQ0099",
+      "mode": "test",
+      "created_at": "2026-04-04T08:00:00Z",
+      "updated_at": "2026-04-04T08:05:00Z",
+      "severity": {
+        "id": "sev_SEV3",
+        "name": "SEV3",
+        "rank": 1
+      },
+      "incident_status": {
+        "id": "st",
+        "name": "Closed",
+        "category": "closed"
+      },
+      "custom_field_entries": [
+        {
+          "custom_field": {
+            "id": "cf_svc",
+            "name": "Affected services"
+          },
+          "values": [
+            {
+              "value_catalog_entry": {
+                "id": "ce_auth-api",
+                "name": "auth-api"
+              }
+            }
+          ]
+        }
+      ],
+      "incident_timestamp_values": []
+    }
+  ],
+  "pagination_meta": {
+    "page_size": 3
+  }
+}

@@ -18,6 +18,16 @@ defmodule ForecastLoopWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
+
+    live "/queue", QueueLive
+    live "/questions", QuestionsLive
+    live "/questions/:id", QuestionLive
+    live "/calibration", CalibrationLive
+    live "/signals", SignalsLive
+    live "/knowledge", KnowledgeLive
+    live "/packs", PacksLive
+    live "/packs/:name", PackLive
+    live "/runs", RunsLive
   end
 
   # Other scopes may use custom stacks.

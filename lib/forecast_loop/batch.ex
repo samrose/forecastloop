@@ -65,6 +65,35 @@ defmodule ForecastLoop.Batch do
     n
   end
 
+  @doc """
+  Makes the open work items of one (kind, subject_type) match `rows`: opens an item
+  for each row whose `"subject_id"` has none, and closes open items whose subject is
+  not in `rows`. Each row's `"detail"` becomes the payload. Returns opened/closed counts.
+  """
+  @spec sync_work_items(String.t(), String.t(), [map()], integer() | nil, String.t() | nil) ::
+          %{String.t() => integer()}
+  def sync_work_items(kind, subject_type, rows, run_id, rule \\ nil) do
+    ids = Enum.map(rows, &to_string(&1["subject_id"]))
+
+    opened =
+      Enum.reduce(rows, 0, fn row, n ->
+        payload = Map.put(row["detail"] || %{}, "rule", rule || subject_type)
+        n + open_work_item(kind, subject_type, row["subject_id"], payload, run_id)
+      end)
+
+    {closed, _} =
+      Repo.update_all(
+        from(w in WorkItem,
+          where:
+            w.status == "open" and w.kind == ^kind and w.subject_type == ^subject_type and
+              w.subject_id not in ^ids
+        ),
+        set: [status: "done", updated_at: DateTime.utc_now()]
+      )
+
+    %{"opened" => opened, "closed" => closed, "rows" => length(rows)}
+  end
+
   @doc "Marks open work items of `kinds` for one subject as done. Returns the count closed."
   @spec close_work_items([String.t()], String.t(), term()) :: non_neg_integer()
   def close_work_items(kinds, subject_type, subject_id) do
@@ -79,6 +108,20 @@ defmodule ForecastLoop.Batch do
       )
 
     n
+  end
+
+  @doc "Marks one work item done or dismissed (a person's decision in the queue)."
+  @spec set_work_item_status(integer(), String.t(), String.t()) ::
+          {:ok, WorkItem.t()} | {:error, term()}
+  def set_work_item_status(id, status, asserted_by)
+      when status in ["done", "dismissed", "open"] do
+    case Repo.get(WorkItem, id) do
+      nil ->
+        {:error, :not_found}
+
+      item ->
+        item |> Ecto.Changeset.change(status: status, asserted_by: asserted_by) |> Repo.update()
+    end
   end
 
   @doc "Lists work items, open first."

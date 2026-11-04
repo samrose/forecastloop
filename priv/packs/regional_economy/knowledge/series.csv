@@ -1,0 +1,2 @@
+predicate,subject,object,attributes,valid_from,valid_to,domain,note
+same_as,ingham_unemployment_rate,ingham_unemployment_rate_bls,"{""priority"":{""ingham_unemployment_rate_bls"":1,""ingham_unemployment_rate"":2},""tolerance"":0.05}",,,regional_economy,FRED republishes the BLS LAUS series. BLS is the original publisher and ranks first. Values may differ by rounding only.

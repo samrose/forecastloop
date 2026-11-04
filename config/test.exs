@@ -44,3 +44,9 @@ config :phoenix,
 
 # HTTP CSV sources call a Req.Test stub in tests instead of the network.
 config :forecast_loop, :http_csv_req_options, plug: {Req.Test, ForecastLoop.Sources.HTTPCSV}
+
+config :forecast_loop, :runs_dir, Path.join(System.tmp_dir!(), "forecast_loop_test_runs")
+
+# The release_engineering pack's sources call a Req.Test stub in tests.
+config :forecast_loop, :release_engineering_req_options,
+  plug: {Req.Test, ForecastLoop.Packs.ReleaseEngineering.HTTP}

@@ -40,7 +40,8 @@
               echo "unix_socket_directories = '$PGDATA'" >> "$PGDATA/postgresql.conf"
               echo "listen_addresses = 'localhost'" >> "$PGDATA/postgresql.conf"
             fi
-            echo "PostgreSQL: run 'pg_ctl -l \$PGDATA/log start' to start the local cluster."
+            # stderr, so that stdout stays clean for `nix develop -c mix forecast_loop.mcp`.
+            echo "PostgreSQL: run 'pg_ctl -l \$PGDATA/log start' to start the local cluster." >&2
           '';
         };
       });

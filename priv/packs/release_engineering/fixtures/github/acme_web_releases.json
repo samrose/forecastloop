@@ -1,0 +1,32 @@
+[
+  {
+    "id": 2001,
+    "tag_name": "2026.01.20",
+    "name": "2026.01.20",
+    "draft": false,
+    "prerelease": false,
+    "created_at": "2026-01-20T14:00:00Z",
+    "published_at": "2026-01-20T14:00:00Z",
+    "html_url": "https://github.com/x/releases/2026.01.20"
+  },
+  {
+    "id": 2002,
+    "tag_name": "2026.02.25",
+    "name": "2026.02.25",
+    "draft": false,
+    "prerelease": false,
+    "created_at": "2026-02-25T14:00:00Z",
+    "published_at": "2026-02-25T14:00:00Z",
+    "html_url": "https://github.com/x/releases/2026.02.25"
+  },
+  {
+    "id": 2003,
+    "tag_name": "2026.04.15",
+    "name": "2026.04.15",
+    "draft": false,
+    "prerelease": false,
+    "created_at": "2026-04-15T14:00:00Z",
+    "published_at": "2026-04-15T14:00:00Z",
+    "html_url": "https://github.com/x/releases/2026.04.15"
+  }
+]

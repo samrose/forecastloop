@@ -22,4 +22,5 @@ LANGUAGE sql STABLE AS $$
   ) s
   WHERE s.prev_value IS NOT NULL
     AND (p_mode <> 'percent' OR s.prev_value <> 0)
+  ORDER BY s.effective_at, s.source_record_id
 $$;

@@ -11,4 +11,5 @@ LANGUAGE sql STABLE AS $$
   JOIN observations_as_of(p_as_of) d
     ON d.signal_id = p_denominator AND d.source_record_id = n.source_record_id
   WHERE n.signal_id = p_numerator AND n.value IS NOT NULL AND d.value IS NOT NULL AND d.value <> 0
+  ORDER BY n.effective_at, n.source_record_id
 $$;

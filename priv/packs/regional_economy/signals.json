@@ -1,0 +1,88 @@
+[
+  {
+    "name": "ingham_unemployment_rate",
+    "domain": "regional_economy",
+    "kind": "series",
+    "cadence": "monthly",
+    "units": "percent",
+    "definition_notes": "Unemployment rate, Ingham County, MI, not seasonally adjusted. BLS Local Area Unemployment Statistics, republished by FRED as MIINGH5URN.",
+    "source_spec": {
+      "system": "http_csv",
+      "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=MIINGH5URN",
+      "fields": {"effective_at": "observation_date", "value": "MIINGH5URN"},
+      "date_format": "ymd",
+      "missing_values": ["", "."],
+      "constant_attributes": {"place": "Ingham County", "publisher": "fred"},
+      "entity_attributes": ["place"],
+      "publication_lag": "P1M30D"
+    }
+  },
+  {
+    "name": "ingham_labor_force",
+    "domain": "regional_economy",
+    "kind": "series",
+    "cadence": "monthly",
+    "units": "persons",
+    "definition_notes": "Civilian labor force, Ingham County, MI, not seasonally adjusted (FRED MIINGH5LFN).",
+    "source_spec": {
+      "system": "http_csv",
+      "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=MIINGH5LFN",
+      "fields": {"effective_at": "observation_date", "value": "MIINGH5LFN"},
+      "date_format": "ymd",
+      "constant_attributes": {"place": "Ingham County", "publisher": "fred"},
+      "entity_attributes": ["place"],
+      "publication_lag": "P1M30D"
+    }
+  },
+  {
+    "name": "mi_building_permits",
+    "domain": "regional_economy",
+    "kind": "series",
+    "cadence": "monthly",
+    "units": "housing units",
+    "definition_notes": "New private housing units authorized by building permits, Michigan, not seasonally adjusted (Census Building Permits Survey, FRED MIBPPRIV). State level: FRED has no monthly series for the county or the Lansing metro area.",
+    "source_spec": {
+      "system": "http_csv",
+      "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=MIBPPRIV",
+      "fields": {"effective_at": "observation_date", "value": "MIBPPRIV"},
+      "date_format": "ymd",
+      "constant_attributes": {"place": "Michigan", "publisher": "fred"},
+      "entity_attributes": ["place"],
+      "publication_lag": "P1M18D"
+    }
+  },
+  {
+    "name": "mi_business_applications",
+    "domain": "regional_economy",
+    "kind": "series",
+    "cadence": "monthly",
+    "units": "applications",
+    "definition_notes": "Business applications, Michigan, seasonally adjusted (Census Business Formation Statistics, FRED BABATOTALSAMI). Used as the count of new business registrations.",
+    "source_spec": {
+      "system": "http_csv",
+      "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=BABATOTALSAMI",
+      "fields": {"effective_at": "observation_date", "value": "BABATOTALSAMI"},
+      "date_format": "ymd",
+      "constant_attributes": {"place": "Michigan", "publisher": "fred"},
+      "entity_attributes": ["place"],
+      "publication_lag": "P1M12D"
+    }
+  },
+  {
+    "name": "ingham_unemployment_rate_bls",
+    "domain": "regional_economy",
+    "kind": "series",
+    "cadence": "monthly",
+    "units": "percent",
+    "definition_notes": "The same LAUS series from its original publisher, BLS (series LAUCN260650000000003). BLS serves no plain CSV download, so this signal reads a CSV file that you save at the path in source_spec (columns DATE, VALUE). Until the file exists, each run opens a refresh_failed work item for this signal.",
+    "source_spec": {
+      "system": "csv",
+      "path": "priv/packs/regional_economy/data/LAUCN260650000000003.csv",
+      "fields": {"effective_at": "DATE", "value": "VALUE"},
+      "date_format": "ymd",
+      "constant_attributes": {"place": "Ingham County", "publisher": "bls"},
+      "entity_attributes": ["place"],
+      "publication_lag": "P1M30D"
+    }
+  }
+]

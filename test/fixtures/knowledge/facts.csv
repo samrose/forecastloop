@@ -1,0 +1,7 @@
+predicate,subject,object,attributes,valid_from,valid_to,domain,note
+value_alias,level:L0,critical,,,2026-03-01,ops,old scale
+entity_alias,svc-a-old,svc-a,,,,ops,renamed
+entity_attr,svc-a,team=team-x,,,,ops,
+entity_domain,team-x,ops,,,,ops,
+min_history,ops,3,,,,ops,
+class_rule,origin,change_related,"{""equals"":""change"",""negates"":[""hardware""]}",,,ops,

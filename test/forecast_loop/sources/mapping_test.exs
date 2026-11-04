@@ -66,4 +66,19 @@ defmodule ForecastLoop.Sources.MappingTest do
     assert {:ok, [%{observed_at: ~U[2026-10-05 00:00:00.000000Z]}]} =
              Mapping.to_rows(recs, spec, @now, ~U[2026-09-05 00:00:00.000000Z])
   end
+
+  test "constant attributes are added to every row" do
+    spec = %{"fields" => %{"effective_at" => "d"}, "constant_attributes" => %{"place" => "P"}}
+
+    assert {:ok, [%{attributes: %{"place" => "P"}}]} =
+             Mapping.to_rows([%{"d" => "2026-09-01"}], spec, @now)
+  end
+
+  test "publication_lag sets an assumed observed_at, capped at fetch time" do
+    spec = %{"fields" => %{"effective_at" => "d"}, "publication_lag" => "P1M21D"}
+    recs = [%{"d" => "2026-08-01"}, %{"d" => "2026-10-01"}]
+    assert {:ok, [old, recent]} = Mapping.to_rows(recs, spec, @now)
+    assert old.observed_at == ~U[2026-09-22 00:00:00.000000Z] and old.assumed_observed_at
+    assert recent.observed_at == @now
+  end
 end

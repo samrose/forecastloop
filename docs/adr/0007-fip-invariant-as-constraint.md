@@ -1,4 +1,4 @@
-# 0007. The "live" invariant is a database constraint; promotion is a rule
+# 0007. A database constraint guards the "live" invariant, and a rule drives promotion
 
 - Status: accepted
 - Date: 2026-11-03

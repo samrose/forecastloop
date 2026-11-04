@@ -1,7 +1,7 @@
 defmodule ForecastLoop.Sources.HTTPCSV do
   @moduledoc """
-  Fetches a CSV document over HTTP(S). Public data publishers such as FRED and
-  state open-data portals serve CSV this way.
+  Fetches a CSV document over HTTP(S). Many public statistics publishers and
+  open-data portals serve data this way.
 
   Spec: `%{"system" => "http_csv", "url" => url, "headers" => %{...}, "fields" => ...,
   "date_format" => ...}`. See `ForecastLoop.Sources.Mapping` for `fields`.

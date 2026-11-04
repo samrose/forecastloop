@@ -1,0 +1,7 @@
+predicate,subject,object,attributes,valid_from,valid_to,domain,note
+entity_alias,acme/auth-service,auth-api,,,,release_engineering,The repository that deploys auth-api.
+entity_alias,acme/web,web-frontend,,,,release_engineering,The repository that deploys web-frontend.
+entity_attr,auth-api,owner=release-eng,,,,release_engineering,
+entity_attr,web-frontend,owner=release-eng,,,,release_engineering,
+entity_domain,release-eng,release_engineering,,,,release_engineering,Services owned by release-eng are forecast in this domain.
+min_history,release_engineering,20,,,,release_engineering,Classified incidents before base-rate models run.

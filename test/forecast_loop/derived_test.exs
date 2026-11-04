@@ -1,5 +1,5 @@
 defmodule ForecastLoop.DerivedTest do
-  use ForecastLoop.DataCase, async: true
+  use ForecastLoop.DataCase, async: false
 
   alias ForecastLoop.{Batch, Observations, Refresh, Signals}
   alias ForecastLoop.Sources.Derived
@@ -161,5 +161,26 @@ defmodule ForecastLoop.DerivedTest do
 
     assert {:error, :refresh_failed, {:unknown_input_signal, "missing"}} =
              Refresh.refresh_signal(s)
+  end
+
+  test "sum and mean wait for the last input step of a period; count does not" do
+    s = signal(%{name: "monthly_in", cadence: "monthly"})
+
+    for {m, v} <- [{"01", 1.0}, {"02", 2.0}],
+        do: observe(s, "2026-#{m}", "2026-#{m}-01T00:00:00Z", @t0, v)
+
+    spec = %{
+      "operation" => "aggregate_by_period",
+      "signal" => "monthly_in",
+      "period" => "quarterly",
+      "agg" => "sum"
+    }
+
+    # As of 2026-04-01 the quarter has ended, but March is not published yet.
+    assert {:ok, []} = Derived.compute(spec, Batch.as_of())
+    observe(s, "2026-03", "2026-03-01T00:00:00Z", @t0, 3.0)
+
+    assert {:ok, [%{source_record_id: "2026-Q1", value: 6.0}]} =
+             Derived.compute(spec, Batch.as_of())
   end
 end

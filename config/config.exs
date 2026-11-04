@@ -11,17 +11,25 @@ config :forecast_loop,
   ecto_repos: [ForecastLoop.Repo],
   generators: [timestamp_type: :utc_datetime_usec, binary_id: false]
 
+# All timestamps are timestamptz in UTC, and every session runs in UTC (docs/adr/0015).
 config :forecast_loop, ForecastLoop.Repo,
-  migration_timestamps: [type: :utc_datetime_usec],
+  migration_timestamps: [type: :timestamptz],
+  parameters: [timezone: "UTC"],
   migration_primary_key: [type: :bigserial]
 
 # Oban (a PostgreSQL-backed job queue) runs the nightly batch.
-# Phase 4 adds the 02:00 UTC cron entry for ForecastLoop.Batch.NightlyWorker.
+# The nightly batch runs at 02:00 UTC.
 config :forecast_loop, Oban,
   engine: Oban.Engines.Basic,
   repo: ForecastLoop.Repo,
   queues: [batch: 1],
-  plugins: [{Oban.Plugins.Pruner, max_age: 60 * 60 * 24 * 30}]
+  plugins: [
+    {Oban.Plugins.Pruner, max_age: 60 * 60 * 24 * 30},
+    {Oban.Plugins.Cron, crontab: [{"0 2 * * *", ForecastLoop.Batch.NightlyWorker}]}
+  ]
+
+# Knowledge snapshots of each run are written under this directory.
+config :forecast_loop, :runs_dir, "priv/runs"
 
 # Numerical work runs on EXLA (Nx compiled with the XLA compiler).
 config :nx, default_backend: EXLA.Backend

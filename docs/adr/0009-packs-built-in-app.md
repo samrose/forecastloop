@@ -16,7 +16,7 @@ The prompt defines a domain pack as a repository folder that a developer writes 
   3. Answer the gap-rule work items (unknown entity, unclassified event, missing history). Each answer is a knowledge fact.
   4. Add question templates and starter scenarios.
 - A user-built pack uses only generic sources. A pack that needs a bespoke API source (for example `release_engineering`) still ships an Elixir module.
-- A derived series is a declarative spec, not free SQL. The core supports a fixed set of operations (for example: count events in a class for each entity for each period; change over N periods; ratio of two series). One core SQL view evaluates each operation.
+- A derived series is a declarative spec, not free SQL. The core supports a fixed set of operations (for example: count events in a class for each entity for each period, change over N periods, or the ratio of two series). One core SQL view evaluates each operation.
 - The folder layout of the prompt becomes the import/export format. `mix forecast_loop.pack.install <name>` imports a folder. An export task writes one. The two shipped packs load through import, the same path as any other pack.
 
 ## Consequences

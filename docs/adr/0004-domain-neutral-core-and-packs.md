@@ -1,4 +1,4 @@
-# 0004. Domain-neutral core; domain content only in packs
+# 0004. A domain-neutral core, with domain content only in packs
 
 - Status: accepted
 - Date: 2026-11-03
