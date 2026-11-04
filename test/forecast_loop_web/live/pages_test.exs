@@ -147,8 +147,55 @@ defmodule ForecastLoopWeb.PagesTest do
           asserted_by: "t"
         })
 
-      {:ok, _view, html} = live(conn, "/questions/#{q.id}")
-      assert html =~ "Resolution: TRUE" and html =~ "4.6" and html =~ "history-m"
+      {:ok, view, html} = live(conn, "/questions/#{q.id}")
+      assert html =~ "Outcome: TRUE" and html =~ "4.6" and html =~ "history-m"
+      assert has_element?(view, "#condition-text", "A person resolves")
+      assert has_element?(view, "#result-m", "said 20% TRUE, so it leaned the wrong way")
+      assert has_element?(view, "#result-m", "Brier score 0.64")
+    end
+
+    test "a resolved series question explains the value used and its inputs", %{conn: conn} do
+      s = signal(%{name: "level", cadence: "monthly", units: "points"})
+      observe(s, "a", "2026-01-01T00:00:00Z", "2026-01-15T00:00:00Z", 7.0)
+
+      q =
+        live_question(agent(), %{
+          resolution_condition:
+            series_rc(s, ">", 5, "2026-01-01T00:00:00Z", "2026-02-01T00:00:00Z")
+        })
+
+      {:ok, _} =
+        Ledger.resolve_question(q, %{
+          outcome: true,
+          resolved_at: ts("2026-03-01T00:00:00Z"),
+          source: "rule",
+          evidence: %{
+            "as_of" => "2026-03-01T00:00:00+00:00",
+            "window_from" => "2026-01-01T00:00:00+00:00",
+            "window_to" => "2026-02-01T00:00:00+00:00",
+            "end_effective_at" => "2026-01-01T00:00:00+00:00",
+            "statistic" => 7.0
+          },
+          resolved_by: "batch",
+          asserted_by: "t"
+        })
+
+      {:ok, view, _html} = live(conn, "/questions/#{q.id}")
+
+      assert has_element?(
+               view,
+               "#condition-text",
+               "TRUE if the last value of level (in points) in the month 2026-01"
+             )
+
+      assert has_element?(
+               view,
+               "#value-used",
+               "The value used is 7, the value of level for 2026-01"
+             )
+
+      assert has_element?(view, "#evidence-inputs", "2026-01")
+      assert has_element?(view, "#result-summary", "No forecast was made before the resolution")
     end
   end
 

@@ -6,7 +6,8 @@ defmodule ForecastLoopWeb.QuestionLive do
   """
   use ForecastLoopWeb, :live_view
 
-  alias ForecastLoop.{Ledger, Signals}
+  alias ForecastLoop.{Explain, Ledger, Repo, Signals}
+  alias ForecastLoop.Signals.Signal
 
   @impl true
   def mount(%{"id" => id}, _session, socket) do
@@ -19,7 +20,20 @@ defmodule ForecastLoopWeb.QuestionLive do
   defp load(socket) do
     q = Ledger.get_question_with_history!(socket.assigns.id)
     history = q.forecasts |> Enum.group_by(& &1.agent.name) |> Enum.sort()
-    assign(socket, q: q, history: history, page_title: q.title)
+    rc = q.resolution_condition || %{}
+    signal = if is_integer(rc["signal_id"]), do: Repo.get(Signal, rc["signal_id"])
+    evidence = (q.resolution && q.resolution.evidence) || %{}
+
+    assign(socket,
+      q: q,
+      history: history,
+      page_title: q.title,
+      signal: signal,
+      condition_text: Explain.condition(rc, signal),
+      results: Explain.results(q),
+      value_used: q.resolution && Explain.value_used(rc, evidence, signal),
+      points: if(q.resolution, do: Explain.evidence_points(rc, evidence, signal), else: [])
+    )
   end
 
   @impl true
@@ -73,7 +87,17 @@ defmodule ForecastLoopWeb.QuestionLive do
       <.list>
         <:item title="Event definition">{@q.event_definition}</:item>
         <:item title="Resolution condition">
-          <code class="text-xs">{Jason.encode!(@q.resolution_condition)}</code>
+          <p id="condition-text">{@condition_text}</p>
+          <p :if={@signal} class="text-sm">
+            Signal:
+            <.link navigate={~p"/signals" <> "#signal-#{@signal.id}"} class="link">
+              {@signal.name}
+            </.link>
+          </p>
+          <details class="text-xs">
+            <summary>Stored condition (JSON)</summary>
+            <code>{Jason.encode!(@q.resolution_condition)}</code>
+          </details>
         </:item>
         <:item title="Author">{@q.created_by && @q.created_by.name}</:item>
         <:item title="Reviewer">{(@q.reviewed_by && @q.reviewed_by.name) || "none yet"}</:item>
@@ -89,14 +113,45 @@ defmodule ForecastLoopWeb.QuestionLive do
         <button class="btn btn-sm">Record review</button>
       </form>
 
-      <section :if={@q.resolution} id="resolution" class="border border-base-300 rounded p-3">
+      <section
+        :if={@q.resolution}
+        id="result-summary"
+        class="border border-base-300 rounded p-3 space-y-1"
+      >
         <h2 class="font-semibold">
-          Resolution: {if @q.resolution.outcome, do: "TRUE", else: "FALSE"}
+          Outcome: {if @q.resolution.outcome, do: "TRUE", else: "FALSE"}
         </h2>
-        <p class="text-sm">
-          {@q.resolution.source} · {DateTime.to_iso8601(@q.resolution.resolved_at)} · by {@q.resolution.resolved_by}
+        <p :if={@results == []} class="text-sm">
+          No forecast was made before the resolution, so no forecast has a score.
         </p>
-        <pre class="text-xs whitespace-pre-wrap">{Jason.encode!(@q.resolution.evidence, pretty: true)}</pre>
+        <p :for={r <- @results} id={"result-#{r.agent}"} class="text-sm">
+          <strong>{r.agent}</strong> said {round(r.probability * 100)}% TRUE, so {r.lean}.
+          Brier score {Float.round(r.brier, 2)}, {r.verdict}.
+        </p>
+        <p :if={@results != []} class="text-xs opacity-70">
+          The Brier score is the squared gap between the forecast probability and the outcome
+          (TRUE = 1, FALSE = 0). 0 is perfect, 0.25 is the score of a 50% guess, and 1 is fully wrong.
+          Only each agent's last forecast before the resolution counts.
+        </p>
+      </section>
+
+      <section
+        :if={@q.resolution}
+        id="resolution"
+        class="border border-base-300 rounded p-3 space-y-2"
+      >
+        <h2 class="font-semibold">Evidence</h2>
+        <p class="text-sm">
+          Resolved by {@q.resolution.resolved_by} on {DateTime.to_iso8601(@q.resolution.resolved_at)} ({@q.resolution.source}).
+        </p>
+        <p :if={@value_used} id="value-used" class="text-sm">{@value_used}</p>
+        <div :if={@points != []} id="evidence-inputs" class="text-sm">
+          <.evidence_point :for={pt <- @points} point={pt} signal={@signal} />
+        </div>
+        <details class="text-xs">
+          <summary>Stored evidence (JSON)</summary>
+          <pre class="whitespace-pre-wrap">{Jason.encode!(@q.resolution.evidence, pretty: true)}</pre>
+        </details>
       </section>
 
       <section id="history">
@@ -135,6 +190,30 @@ defmodule ForecastLoopWeb.QuestionLive do
         <button class="btn btn-primary">Record forecast</button>
       </form>
     </Layouts.app>
+    """
+  end
+
+  attr :point, :map, required: true
+  attr :signal, :any, required: true
+
+  # One value with the input values it was computed from, nested.
+  defp evidence_point(assigns) do
+    ~H"""
+    <div class="evidence-point">
+      <p>
+        <span class="font-mono">{@signal.name}</span>
+        for <strong>{@point.label}</strong>: {Explain.number(@point.value)}
+      </p>
+      <div :for={g <- @point.inputs} class="ml-5 border-l border-base-300 pl-3">
+        <p class="opacity-70">
+          Computed from <.link navigate={~p"/signals" <> "#signal-#{g.signal.id}"} class="link">
+            {g.signal.name}
+          </.link>, {g.note}:
+        </p>
+        <.evidence_point :for={pt <- g.points} point={pt} signal={g.signal} />
+        <p :if={g.more > 0} class="opacity-70">and {g.more} more</p>
+      </div>
+    </div>
     """
   end
 end

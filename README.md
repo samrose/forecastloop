@@ -32,6 +32,8 @@ The Nix flake (the file that pins the development tools) gives Elixir 1.20, Erla
 6. Start the web interface: `mix phx.server`, then open <http://localhost:4000>.
 7. Run the checks: `mix test`, `mix format --check-formatted` and `mix credo --strict`.
 
+For the full procedure, expected results and fixes for common problems, read [`docs/RUNNING.md`](docs/RUNNING.md). It also shows how to load the regional_economy pack from recorded files while live FRED downloads fail.
+
 The batch also runs every night at 02:00 UTC as an Oban job. Oban is the PostgreSQL-backed job queue.
 
 ## The loop
@@ -187,7 +189,7 @@ The tools are `list_packs`, `install_pack`, `create_pack`, `export_pack`, `list_
 | Page | What it shows |
 | --- | --- |
 | Queue | Open work items, gaps first. An unknown entity or an unclassified event has an inline form to assert a fact. |
-| Questions | Questions by domain, status and deadline. Each question shows all agents' forecast history, its resolution and evidence, a review form, and forecast entry (slider, rationale, cited signals). |
+| Questions | Questions by domain, status and deadline. Each question shows its condition as a sentence, each forecast against the outcome with its Brier score, the evidence with its input values, all agents' forecast history, a review form, and forecast entry (slider, rationale, cited signals). |
 | Calibration | For each agent and domain: Brier, log score, skill, Murphy decomposition, and a reliability diagram. It also shows drift and suspected collapse. |
 | Signals | The catalog by domain, with a sparkline, regime shifts, definition changes and consumers. |
 | Knowledge | Facts by predicate and domain, with validity ranges and inline editing. |
@@ -204,3 +206,9 @@ The tools are `list_packs`, `install_pack`, `create_pack`, `export_pack`, `list_
 ## Decisions
 
 Every design decision is an ADR in [`docs/adr/`](docs/adr/). [`DECISIONS.md`](DECISIONS.md) is the index. The full specification is [`docs/BUILD_PROMPT.md`](docs/BUILD_PROMPT.md).
+
+## License
+
+Copyright 2026 Sam Rose.
+
+ForecastLoop is licensed under the Apache License, Version 2.0. The full text is in [`LICENSE`](LICENSE). The license lets you use, change and share the code, and it includes a patent grant. If you share a changed copy, keep the `LICENSE` file and mark the files that you changed ([ADR 0021](docs/adr/0021-apache-2-license.md)).

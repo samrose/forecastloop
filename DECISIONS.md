@@ -24,3 +24,5 @@ Each design decision is an ADR (Architecture Decision Record) in [`docs/adr/`](d
 | [0018](docs/adr/0018-backfill-vintages-and-pack-data.md) | publication_lag for backfills, sum/mean period completeness, constant attributes, pack columns on scenarios and model versions, change-point max_points. |
 | [0019](docs/adr/0019-release-engineering-pack.md) | Pack sources are found by module. An explicit class_rule negation beats a link_rule. Vintage rules for incident.io and GitHub. The fixtures are hand-written. |
 | [0020](docs/adr/0020-mcp-server.md) | Own stdio MCP server with logs on stderr, schema validation, extra review/pack tools, a restricted role for the query tool, and named agents. |
+| [0021](docs/adr/0021-apache-2-license.md) | The project uses the Apache License 2.0. |
+| [0022](docs/adr/0022-plain-language-question-page.md) | The question page writes its condition, result and evidence in plain language, with the Brier score and the input values. |
