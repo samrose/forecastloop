@@ -12,7 +12,18 @@ defmodule ForecastLoop.Sources.Mapping do
       },
       "date_format" => "iso8601",            # iso8601 | ymd | mdy | ym, or a map
                                              # %{"effective_at" => "ym", "observed_at" => "ymd"}
-      "missing_values" => ["", "."]          # strings that mean "no value"
+      "missing_values" => ["", "."],         # strings that mean "no value"
+      "constant_attributes" => %{"place" => "X"}, # attributes added to every row
+      "publication_lag" => "P1M21D"          # see below
+
+  ## Publication lag
+
+  Many publishers give no publication date. Then `observed_at` is the fetch time,
+  so a replay at an earlier date cannot see a backfilled value. With
+  `publication_lag` (an ISO 8601 duration), a row without an `observed_at` column
+  gets `observed_at = min(effective_at + lag, fetch time)` and is marked
+  `assumed_observed_at: true`. The refresh step uses the fetch time instead for a
+  revision of a record that it already holds. See docs/adr/0018.
   """
 
   alias ForecastLoop.Sources
@@ -72,8 +83,14 @@ defmodule ForecastLoop.Sources.Mapping do
 
   defp after_since(rows, nil), do: rows
 
+  # A row with an assumed publication time is not a real vintage, so it is kept: the
+  # refresh step decides whether it is new, unchanged or a revision.
   defp after_since(rows, since),
-    do: Enum.filter(rows, &(DateTime.compare(&1.observed_at, since) == :gt))
+    do:
+      Enum.filter(
+        rows,
+        &(&1[:assumed_observed_at] == true or DateTime.compare(&1.observed_at, since) == :gt)
+      )
 
   defp to_row(rec, f, spec, fetched_at) do
     fmt = &date_format(spec, &1)
@@ -84,17 +101,34 @@ defmodule ForecastLoop.Sources.Mapping do
          {:ok, value} <- parse_value(f["value"] && rec[f["value"]], missing) do
       id_col = f["source_record_id"] || f["effective_at"]
 
-      {:ok,
-       %{
-         source_record_id: to_string(rec[id_col]),
-         effective_at: eff,
-         observed_at: obs,
-         value: value,
-         attributes:
-           Map.new(Map.get(f, "attributes", %{}), fn {name, col} ->
-             {name, json_safe(rec[col])}
-           end)
-       }}
+      mapped =
+        Map.new(Map.get(f, "attributes", %{}), fn {name, col} -> {name, json_safe(rec[col])} end)
+
+      row = %{
+        source_record_id: to_string(rec[id_col]),
+        effective_at: eff,
+        observed_at: obs,
+        value: value,
+        attributes: Map.merge(Map.get(spec, "constant_attributes", %{}), mapped)
+      }
+
+      {:ok, assume_publication(row, spec, f, fetched_at)}
+    end
+  end
+
+  # Applies `publication_lag` to rows whose observed_at is the fetch time.
+  defp assume_publication(row, spec, fields, fetched_at) do
+    with lag when is_binary(lag) <- spec["publication_lag"],
+         nil <- fields["observed_at"],
+         {:ok, duration} <- Duration.from_iso8601(lag) do
+      assumed = DateTime.shift(row.effective_at, duration)
+
+      Map.merge(row, %{
+        observed_at: Enum.min([assumed, fetched_at], DateTime),
+        assumed_observed_at: true
+      })
+    else
+      _ -> row
     end
   end
 

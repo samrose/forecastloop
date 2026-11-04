@@ -35,41 +35,56 @@ defmodule ForecastLoopWeb.Layouts do
 
   def app(assigns) do
     ~H"""
-    <header class="navbar px-4 sm:px-6 lg:px-8">
+    <header class="navbar px-4 sm:px-6 lg:px-8 border-b border-base-300">
       <div class="flex-1">
-        <a href="/" class="flex-1 flex w-fit items-center gap-2">
-          <img src={~p"/images/logo.svg"} width="36" />
-          <span class="text-sm font-semibold">v{Application.spec(:phoenix, :vsn)}</span>
-        </a>
+        <a href="/" class="text-lg font-semibold">ForecastLoop</a>
       </div>
-      <div class="flex-none">
-        <ul class="flex flex-column px-1 space-x-4 items-center">
-          <li>
-            <a href="https://phoenixframework.org/" class="btn btn-ghost">Website</a>
+      <nav class="flex-none">
+        <ul class="flex flex-wrap px-1 gap-x-1 items-center text-sm">
+          <li :for={{label, path} <- nav_links()}>
+            <a href={path} class="btn btn-ghost btn-sm">{label}</a>
           </li>
-          <li>
-            <a href="https://github.com/phoenixframework/phoenix" class="btn btn-ghost">GitHub</a>
-          </li>
-          <li>
-            <.theme_toggle />
-          </li>
-          <li>
-            <a href="https://hexdocs.pm/phoenix/overview.html" class="btn btn-primary">
-              Get Started <span aria-hidden="true">&rarr;</span>
-            </a>
-          </li>
+          <li><.theme_toggle /></li>
         </ul>
-      </div>
+      </nav>
     </header>
 
-    <main class="px-4 py-20 sm:px-6 lg:px-8">
-      <div class="mx-auto max-w-2xl space-y-4">
+    <main class="px-4 py-8 sm:px-6 lg:px-8">
+      <div class="mx-auto max-w-6xl space-y-4">
         {render_slot(@inner_block)}
       </div>
     </main>
 
+    <footer class="px-4 py-6 sm:px-6 lg:px-8 border-t border-base-300 text-xs text-base-content/70">
+      <div class="mx-auto max-w-6xl">
+        ForecastLoop implements Peter Rothman's <em>Computational Futurology</em>
+        framework
+        (the Forecast Integrity Protocol, predictability collapse, and the forecasting loop):
+        <a
+          class="link"
+          href="https://www.linkedin.com/pulse/computational-futurology-moving-beyond-20th-century-peter-rothman-gxonc/"
+        >
+          "Computational Futurology: Moving Beyond 20th-Century Foresight"
+        </a>
+        (10 March 2026). The design, the code and any errors of interpretation are ours, not his.
+      </div>
+    </footer>
+
     <.flash_group flash={@flash} />
     """
+  end
+
+  @doc "Top navigation: one link for each section of the application."
+  def nav_links do
+    [
+      {"Queue", "/queue"},
+      {"Questions", "/questions"},
+      {"Calibration", "/calibration"},
+      {"Signals", "/signals"},
+      {"Knowledge", "/knowledge"},
+      {"Packs", "/packs"},
+      {"Runs", "/runs"}
+    ]
   end
 
   @doc """

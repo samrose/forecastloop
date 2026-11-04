@@ -1,0 +1,34 @@
+[
+  {
+    "name": "release_incident_rate",
+    "domain": "release_engineering",
+    "cadence": "weekly",
+    "units": "incidents per week",
+    "definition_notes": "Weekly count of incidents in class release_related. The Poisson model can read it as its rate_signal.",
+    "spec": {"operation": "aggregate_by_period", "signal": "incidents", "period": "weekly", "agg": "count", "where": {"class": "release_related"}}
+  },
+  {
+    "name": "release_incidents_quarterly",
+    "domain": "release_engineering",
+    "cadence": "quarterly",
+    "units": "incidents",
+    "definition_notes": "Quarterly count of release-related incidents.",
+    "spec": {"operation": "aggregate_by_period", "signal": "incidents", "period": "quarterly", "agg": "count", "where": {"class": "release_related"}}
+  },
+  {
+    "name": "deploys_quarterly",
+    "domain": "release_engineering",
+    "cadence": "quarterly",
+    "units": "deploys",
+    "definition_notes": "Quarterly count of deploys (published releases).",
+    "spec": {"operation": "aggregate_by_period", "signal": "deploys", "period": "quarterly", "agg": "count"}
+  },
+  {
+    "name": "release_incidents_per_deploy_quarterly",
+    "domain": "release_engineering",
+    "cadence": "quarterly",
+    "units": "incidents per deploy",
+    "definition_notes": "Release-related incidents divided by deploys, for each quarter with at least one deploy.",
+    "spec": {"operation": "ratio", "numerator": "release_incidents_quarterly", "denominator": "deploys_quarterly"}
+  }
+]

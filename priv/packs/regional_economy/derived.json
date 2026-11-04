@@ -1,0 +1,26 @@
+[
+  {
+    "name": "ingham_unemployment_3m_change",
+    "domain": "regional_economy",
+    "cadence": "monthly",
+    "units": "percentage points",
+    "definition_notes": "Change in the Ingham County unemployment rate over 3 months.",
+    "spec": {"operation": "change_over_periods", "signal": "ingham_unemployment_rate", "lag": 3, "mode": "difference"}
+  },
+  {
+    "name": "mi_permits_quarterly",
+    "domain": "regional_economy",
+    "cadence": "quarterly",
+    "units": "housing units",
+    "definition_notes": "Michigan building permits summed by calendar quarter. A quarter appears when its last month is published.",
+    "spec": {"operation": "aggregate_by_period", "signal": "mi_building_permits", "period": "quarterly", "agg": "sum"}
+  },
+  {
+    "name": "mi_permits_quarterly_yoy",
+    "domain": "regional_economy",
+    "cadence": "quarterly",
+    "units": "housing units",
+    "definition_notes": "Quarterly Michigan building permits minus the same quarter one year earlier.",
+    "spec": {"operation": "change_over_periods", "signal": "mi_permits_quarterly", "lag": 4, "mode": "difference"}
+  }
+]

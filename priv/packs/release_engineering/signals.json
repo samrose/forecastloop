@@ -1,0 +1,30 @@
+[
+  {
+    "name": "incidents",
+    "domain": "release_engineering",
+    "kind": "events",
+    "cadence": "daily",
+    "definition_notes": "One row per incident.io incident. effective_at = created_at; each update is a new vintage. Attributes: severity, status, service (Affected services), cause, resolved_at.",
+    "source_spec": {
+      "system": "incident_io",
+      "api_key_env": "INCIDENT_IO_API_KEY",
+      "custom_fields": {"service": "Affected services", "cause": "Cause"},
+      "timestamps": {"resolved_at": "Resolved at"},
+      "entity_attributes": ["service"]
+    }
+  },
+  {
+    "name": "deploys",
+    "domain": "release_engineering",
+    "kind": "events",
+    "cadence": "daily",
+    "definition_notes": "One row per published GitHub release of the listed repositories. effective_at = published_at. The repo attribute is an entity; entity_alias facts name the service each repository deploys.",
+    "source_spec": {
+      "system": "github_releases",
+      "kind": "releases",
+      "repos": ["acme/auth-service", "acme/web", "acme/payments"],
+      "token_env": "GITHUB_TOKEN",
+      "entity_attributes": ["repo"]
+    }
+  }
+]

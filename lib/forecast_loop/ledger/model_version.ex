@@ -13,6 +13,7 @@ defmodule ForecastLoop.Ledger.ModelVersion do
     field :params, :map, default: %{}
     field :domains, {:array, :string}, default: []
     field :notes, :string
+    field :pack, :string
     field :asserted_by, :string
     belongs_to :agent, ForecastLoop.Ledger.Agent
     belongs_to :supersedes, __MODULE__
@@ -21,7 +22,16 @@ defmodule ForecastLoop.Ledger.ModelVersion do
 
   def changeset(mv, attrs) do
     mv
-    |> cast(attrs, [:agent_id, :model_module, :version, :params, :domains, :supersedes_id, :notes])
+    |> cast(attrs, [
+      :agent_id,
+      :model_module,
+      :version,
+      :params,
+      :domains,
+      :supersedes_id,
+      :notes,
+      :pack
+    ])
     |> ForecastLoop.Schema.provenance(attrs)
     |> validate_required([:agent_id, :model_module, :version])
     |> unique_constraint([:agent_id, :version])

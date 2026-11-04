@@ -1,0 +1,5 @@
+{
+  "name": "release_engineering",
+  "title": "Release engineering: incidents and deploys",
+  "description": "Software incidents (incident.io) and deploys (GitHub releases). Knowledge facts classify incidents as release-related, by their cause field or by a deploy to the same service within 24 hours before."
+}

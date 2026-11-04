@@ -1,0 +1,2 @@
+unemployment unemployment_rate labor_force county ingham lansing michigan permit permits
+business_applications fred bls laus fips

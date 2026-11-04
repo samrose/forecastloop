@@ -13,7 +13,9 @@ defmodule ForecastLoop.Sources do
   `definition_change` work item and ingests nothing for that signal.
 
   Core systems: `"postgres"`, `"csv"`, `"http_csv"`, `"derived"`. A pack that
-  needs another system adds its module under `config :forecast_loop, :sources`.
+  needs another system ships a module under `ForecastLoop.Packs.<Pack>` that
+  implements this behaviour and the optional `system/0` callback; `systems/0`
+  finds it. `config :forecast_loop, :sources` can also add systems.
   """
 
   @type row :: %{
@@ -35,6 +37,11 @@ defmodule ForecastLoop.Sources do
   @doc "One sentence that says what the source reads and which spec keys it uses."
   @callback describe() :: String.t()
 
+  @doc "The `source_spec[\"system\"]` name of a pack source module."
+  @callback system() :: String.t()
+
+  @optional_callbacks system: 0
+
   @core %{
     "postgres" => ForecastLoop.Sources.Postgres,
     "csv" => ForecastLoop.Sources.CSV,
@@ -42,9 +49,25 @@ defmodule ForecastLoop.Sources do
     "derived" => ForecastLoop.Sources.Derived
   }
 
-  @doc "All registered systems: core systems plus those from `config :forecast_loop, :sources`."
+  @doc "All systems: core systems, pack source modules, and `config :forecast_loop, :sources`."
   @spec systems() :: %{String.t() => module()}
-  def systems, do: Map.merge(@core, Application.get_env(:forecast_loop, :sources, %{}))
+  def systems do
+    @core
+    |> Map.merge(pack_sources())
+    |> Map.merge(Application.get_env(:forecast_loop, :sources, %{}))
+  end
+
+  defp pack_sources do
+    {:ok, modules} = :application.get_key(:forecast_loop, :modules)
+
+    for mod <- modules,
+        String.starts_with?(Atom.to_string(mod), "Elixir.ForecastLoop.Packs."),
+        Code.ensure_loaded?(mod),
+        function_exported?(mod, :system, 0),
+        function_exported?(mod, :fetch, 2),
+        into: %{},
+        do: {mod.system(), mod}
+  end
 
   @doc "Returns the module for a spec's system."
   @spec module_for(spec()) :: {:ok, module()} | {:error, term()}

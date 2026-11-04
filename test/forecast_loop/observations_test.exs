@@ -1,5 +1,5 @@
 defmodule ForecastLoop.ObservationsTest do
-  use ForecastLoop.DataCase, async: true
+  use ForecastLoop.DataCase, async: false
 
   alias ForecastLoop.Observations
 

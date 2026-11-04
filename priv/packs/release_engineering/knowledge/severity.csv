@@ -1,0 +1,7 @@
+predicate,subject,object,attributes,valid_from,valid_to,domain,note
+value_alias,severity:P0,sev1,,,2026-03-01,release_engineering,The old P-scale. It was retired on 2026-03-01.
+value_alias,severity:P1,sev2,,,2026-03-01,release_engineering,The old P-scale.
+value_alias,severity:P2,sev3,,,2026-03-01,release_engineering,The old P-scale.
+value_alias,severity:SEV1,sev1,,,,release_engineering,The incident.io severity names.
+value_alias,severity:SEV2,sev2,,,,release_engineering,
+value_alias,severity:SEV3,sev3,,,,release_engineering,

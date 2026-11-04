@@ -1,0 +1,4 @@
+[
+  {"agent": "model:series_threshold", "model_module": "ForecastLoop.Models.SeriesThreshold", "version": "regional_economy-1", "domains": ["regional_economy"], "params": {"trailing_points": 60}, "notes": "Empirical h-step changes over the last 5 years of monthly data."},
+  {"agent": "model:base_rate", "model_module": "ForecastLoop.Models.BaseRate", "version": "regional_economy-1", "domains": ["regional_economy"], "params": {"trailing_n": 12}, "notes": "Share of the template's last 12 questions that resolved true."}
+]

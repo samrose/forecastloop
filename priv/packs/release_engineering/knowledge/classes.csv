@@ -1,0 +1,3 @@
+predicate,subject,object,attributes,valid_from,valid_to,domain,note
+class_rule,cause,release_related,"{""signal"":""incidents"",""equals"":[""deploy"",""config change""],""negates"":[""hardware"",""third-party"",""capacity""]}",,,release_engineering,The Cause field says a change shipped by us caused it. Hardware or third-party causes are explicitly not release-related.
+link_rule,incidents->deploys,release_related,"{""on"":[""service"",""repo""],""within"":""PT24H""}",,,release_engineering,A deploy to an affected service in the 24 hours before the incident opened.

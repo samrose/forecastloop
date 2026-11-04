@@ -1,0 +1,26 @@
+[
+  {
+    "key": "ingham_unemployment_above",
+    "domain": "regional_economy",
+    "title_pattern": "Is the Ingham County unemployment rate above {{param.x}}% for the last month of {{period}}?",
+    "event_definition_pattern": "The BLS LAUS unemployment rate for Ingham County, MI (not seasonally adjusted, as published by FRED as MIINGH5URN) for the last month of {{period}} is greater than {{param.x}} percent. The window is {{period_start}} to {{period_end}}.",
+    "resolution_condition_pattern": {"type": "series", "signal": "ingham_unemployment_rate", "op": ">", "value": "{{param.x}}", "at": "end_of_window"},
+    "cadence": "quarterly",
+    "window_length": "P3M",
+    "params": {"x": 4.5},
+    "starts_on": "2020-01-01",
+    "active": true
+  },
+  {
+    "key": "mi_permits_beat_prior_year",
+    "domain": "regional_economy",
+    "title_pattern": "Do Michigan building permits in {{period}} exceed the same quarter one year earlier?",
+    "event_definition_pattern": "The sum of monthly new private housing units authorized by building permits in Michigan (Census BPS, FRED MIBPPRIV, not seasonally adjusted) for {{period}} is greater than the sum for the same quarter one year earlier.",
+    "resolution_condition_pattern": {"type": "series", "signal": "mi_permits_quarterly_yoy", "op": ">", "value": 0, "at": "end_of_window"},
+    "cadence": "quarterly",
+    "window_length": "P3M",
+    "params": {},
+    "starts_on": "2020-01-01",
+    "active": true
+  }
+]

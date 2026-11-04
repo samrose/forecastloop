@@ -153,4 +153,35 @@ defmodule ForecastLoop.RefreshTest do
 
     assert cs.errors[:source_spec]
   end
+
+  test "with a publication lag, backfill gets assumed vintages and a later revision gets fetch time",
+       %{tmp_dir: dir} do
+    path = Path.join(dir, "lagged.csv")
+    File.write!(path, "DATE,VALUE\n2025-01-01,4.0\n2025-02-01,4.1\n")
+
+    {:ok, s} =
+      Signals.register_signal(%{
+        name: "lagged",
+        kind: "series",
+        asserted_by: "t",
+        source_spec: %{
+          "system" => "csv",
+          "path" => path,
+          "publication_lag" => "P1M20D",
+          "fields" => %{"effective_at" => "DATE", "value" => "VALUE"}
+        }
+      })
+
+    assert {:ok, 2} = Refresh.refresh_signal(s)
+    assert values(s, ts("2025-02-25T00:00:00Z")) == [4.0]
+    assert values(s, ts("2025-03-25T00:00:00Z")) == [4.0, 4.1]
+    assert {:ok, 0} = Refresh.refresh_signal(s)
+
+    File.write!(path, "DATE,VALUE\n2025-01-01,4.0\n2025-02-01,4.3\n")
+    before = DateTime.utc_now()
+    assert {:ok, 1} = Refresh.refresh_signal(s)
+    assert values(s, ts("2025-03-25T00:00:00Z")) == [4.0, 4.1]
+    assert values(s, DateTime.add(DateTime.utc_now(), 1)) == [4.0, 4.3]
+    assert values(s, before) == [4.0, 4.1]
+  end
 end

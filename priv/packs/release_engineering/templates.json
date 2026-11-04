@@ -1,0 +1,26 @@
+[
+  {
+    "key": "sev12_release_incident_month",
+    "domain": "release_engineering",
+    "title_pattern": "At least one sev1 or sev2 release-related incident in {{period}}?",
+    "event_definition_pattern": "incident.io records at least one incident created in {{period}} ({{period_start}} to {{period_end}}) whose normalized severity is sev1 or sev2 and that the knowledge rules classify as release_related.",
+    "resolution_condition_pattern": {"type": "events", "signal": "incidents", "op": "count>=", "value": 1, "where": {"severity": ["sev1", "sev2"], "class": "release_related"}},
+    "cadence": "monthly",
+    "window_length": "P1M",
+    "params": {},
+    "starts_on": "2025-01-01",
+    "active": true
+  },
+  {
+    "key": "release_incidents_per_deploy_below",
+    "domain": "release_engineering",
+    "title_pattern": "Release-related incidents per deploy in {{period}} below {{param.x}}?",
+    "event_definition_pattern": "In {{period}}, the count of release-related incidents divided by the count of deploys is less than {{param.x}}.",
+    "resolution_condition_pattern": {"type": "series", "signal": "release_incidents_per_deploy_quarterly", "op": "<", "value": "{{param.x}}", "at": "end_of_window"},
+    "cadence": "quarterly",
+    "window_length": "P3M",
+    "params": {"x": 0.25},
+    "starts_on": "2025-01-01",
+    "active": true
+  }
+]

@@ -1,8 +1,10 @@
 defmodule ForecastLoopWeb.PageControllerTest do
   use ForecastLoopWeb.ConnCase
 
-  test "GET /", %{conn: conn} do
-    conn = get(conn, ~p"/")
-    assert html_response(conn, 200) =~ "Peace of mind from prototype to production"
+  test "GET / explains the loop and credits the framework's author", %{conn: conn} do
+    html = conn |> get(~p"/") |> html_response(200)
+    assert html =~ "Forecast Integrity Protocol"
+    assert html =~ "Peter Rothman"
+    assert html =~ "Computational Futurology"
   end
 end

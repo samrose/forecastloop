@@ -121,6 +121,8 @@ defmodule ForecastLoop.Refresh do
   defp changed_vintages(vintages, stored) do
     {kept, _prev} =
       Enum.reduce(vintages, {[], stored}, fn row, {kept, prev} ->
+        row = revision_at_fetch_time(row, prev)
+
         cond do
           prev && DateTime.compare(row.observed_at, prev.observed_at) != :gt -> {kept, prev}
           prev && same_content?(row, prev) -> {kept, prev}
@@ -130,6 +132,14 @@ defmodule ForecastLoop.Refresh do
 
     Enum.reverse(kept)
   end
+
+  # A row with an assumed publication time (docs/adr/0018) that revises a record we
+  # already hold was learned now, at fetch time, not at the assumed time.
+  defp revision_at_fetch_time(%{assumed_observed_at: true} = row, prev) when not is_nil(prev) do
+    if same_content?(row, prev), do: row, else: %{row | observed_at: DateTime.utc_now()}
+  end
+
+  defp revision_at_fetch_time(row, _prev), do: row
 
   defp same_content?(a, b) do
     DateTime.compare(a.effective_at, b.effective_at) == :eq and a.value == b.value and

@@ -7,6 +7,7 @@ defmodule ForecastLoop.Ledger.Scenario do
     field :narrative, :string, default: ""
     field :domain, :string
     field :status, :string, default: "active"
+    field :pack, :string
     field :asserted_by, :string
     has_many :assumptions, ForecastLoop.Ledger.Assumption
     timestamps()
@@ -14,7 +15,7 @@ defmodule ForecastLoop.Ledger.Scenario do
 
   def changeset(scenario, attrs) do
     scenario
-    |> cast(attrs, [:title, :narrative, :domain, :status])
+    |> cast(attrs, [:title, :narrative, :domain, :status, :pack])
     |> ForecastLoop.Schema.provenance(attrs)
     |> validate_required([:title])
     |> validate_inclusion(:status, ~w(draft active retired))
